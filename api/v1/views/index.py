@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""app_views route /status"""
+"""app_views route /status and /stats"""
 from api.v1.views import app_views
 from flask import jsonify
 from models import storage
@@ -22,7 +22,7 @@ def status():
 
 @app_views.route('/stats')
 def stats():
-    """"""
+    """Returns the number of objects"""
     st = {
             "amenities": storage.count(Amenity),
             "cities": storage.count(City),
