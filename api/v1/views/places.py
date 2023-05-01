@@ -30,7 +30,7 @@ def pl_id(place_id):
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'])
-def delete(place_id):
+def pl_del(place_id):
     """Deletes a Place object"""
     obj = storage.get(Place, place_id)
     if obj is not None:
@@ -42,7 +42,7 @@ def delete(place_id):
 
 @app_views.route('/cities/<city_id>/places', methods=['POST'],
                  strict_slashes=False)
-def post():
+def pl_post():
     """Creates a Place"""
     data = request.get_json()
     obj = storage.get(City, city_id)
@@ -64,7 +64,7 @@ def post():
 
 
 @app_views.route('/places/<place_id>', methods=['PUT'], strict_slashes=False)
-def put(state_id):
+def pl_update(state_id):
     """Updates a Place object"""
     obj = storage.get(Place, place_id)
     if obj is not None:
@@ -72,7 +72,7 @@ def put(state_id):
         if not data:
              abort(400, 'Not a JSON')
         for k in data.keys():
-            if k == 'id' or k == 'created_at' or k == 'updated_at'
+            if k == 'id' or k == 'created_at' or k == 'updated_at'\
             or k == 'user_id' or k == 'city_id':
                 pass
             else:

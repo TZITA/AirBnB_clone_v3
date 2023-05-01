@@ -27,8 +27,8 @@ def rev_id(review_id):
     abort(404)
 
 
-@app_views.route('/reviews/<review_id', methods=['DELETE'])
-def delete(review_id):
+@app_views.route('/reviews/<review_id>', methods=['DELETE'])
+def rev_del(review_id):
     """Deletes a Review object"""
     obj = storage.get(Review, review_id)
     if obj is not None:
@@ -38,9 +38,9 @@ def delete(review_id):
     abort(404)
 
 
-@app_views.route('/places/<place_id>/reviews', methods=['POST'],
+@app_views.route('/places/<place_id>/reviews>', methods=['POST'],
                  strict_slashes=False)
-def post():
+def rev_post():
     """Creates a Review"""
     data = request.get_json()
     pl_o = storage.get(Place, place_id)
@@ -62,7 +62,7 @@ def post():
 
 
 @app_views.route('/reviews/<review_id>', methods=['PUT'], strict_slashes=False)
-def put(state_id):
+def rev_update(state_id):
     """Updates a Review object"""
     obj = storage.get(Review, review_id)
     if obj is not None:
@@ -70,10 +70,10 @@ def put(state_id):
         if not data:
             abort(400, 'Not a JSON')
         for k in data.keys():
-            if k == 'id' or k == 'created_at' or k == 'updated_at'
+            if k == 'id' or k == 'created_at' or k == 'updated_at'\
             or k == 'place_id' or k == 'user_id':
                 pass
-            else k == 'text':
+            elif k == 'text':
                 obj.text = data.get(k)
         storage.save()
         return jsonify(obj.to_dict()), 200
