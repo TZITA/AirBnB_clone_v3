@@ -69,7 +69,7 @@ def rev_update(state_id):
             abort(400, 'Not a JSON')
         for k in data.keys():
             if k == 'id' or k == 'created_at' or k == 'updated_at'\
-            or k == 'place_id' or k == 'user_id':
+               or k == 'place_id' or k == 'user_id':
                 pass
             elif k == 'text':
                 obj.text = data.get(k)

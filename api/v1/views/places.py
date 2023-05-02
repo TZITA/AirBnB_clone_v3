@@ -50,11 +50,11 @@ def pl_post():
     if obj is None or usr_o is None:
         abort(404)
     elif not data:
-         abort(400, 'Not a JSON')
+        abort(400, 'Not a JSON')
     elif 'user_id' not in data:
-         abort(400, 'Missing user_id')
+        abort(400, 'Missing user_id')
     elif 'name' not in data:
-         abort(400, 'Missing name')
+        abort(400, 'Missing name')
     pl = Place()
     pl.name = data.get('name')
     pl.user_id = data.get('user_id')
@@ -70,10 +70,10 @@ def pl_update(state_id):
     if obj is not None:
         data = request.get_json()
         if not data:
-             abort(400, 'Not a JSON')
+            abort(400, 'Not a JSON')
         for k in data.keys():
             if k == 'id' or k == 'created_at' or k == 'updated_at'\
-            or k == 'user_id' or k == 'city_id':
+               or k == 'user_id' or k == 'city_id':
                 pass
             else:
                 obj.name = data.get(k)
