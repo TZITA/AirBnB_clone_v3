@@ -1,84 +1,61 @@
 #!/usr/bin/python3
-"""A new view for Place obs that handles all default RESTFul API."""
-from models import storage
-from models.place import Place
+
+""" Handles all restful API actions for Place"""
+
 from api.v1.views import app_views
-from flask import jsonify, abort, request
+from flask import request, jsonify, abort
+from models.place import Place
+from models import storage
 
 
-@app_views.route('/cities/<city_id>/places', methods=['GET'],
-                 strict_slashes=False)
-def places(city_id):
-    """Retrieves the list of all Place objects associated with city_id"""
-    dict_n = []
-    objs = storage.all(Place).values()
-    c_obj = storage.get(City, city_id)
-    if c_obj is None:
+@app_views.route('/places/<place_id>',
+                 methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
+def pl_1(place_id):
+    """Retrives, deletes, updates a place object"""
+    pl_obj = storage.get(Place, place_id)
+    if pl_obj is None:
         abort(404)
-    else:
-        for o in objs:
-            if o.to_dict()['city_id'] == city_id:
-                dict_n.append(o.to_dict())
-        return (jsonify(dict_n))
-
-
-@app_views.route('/places/<place_id>', methods=['GET'], strict_slashes=False)
-def pl_id(place_id):
-    """Retrieves a Place object with the specified id, otherwise 404"""
-    obj = storage.get(Place, place_id)
-    if obj is not None:
-        return (jsonify(obj.to_dict()))
-    abort(404)
-
-
-@app_views.route('/places/<place_id>', methods=['DELETE'])
-def pl_del(place_id):
-    """Deletes a Place object"""
-    obj = storage.get(Place, place_id)
-    if obj is not None:
-        storage.delete(obj)
+    
+    if request.method == 'GET':
+        return jsonify(pl_obj)
+    if request.method == 'DELETE':
+        pl_obj.delete()
         storage.save()
-        return jsonify({})
-    abort(404)
-
-
-@app_views.route('/cities/<city_id>/places', methods=['POST'],
-                 strict_slashes=False)
-def pl_post():
-    """Creates a Place"""
-    data = request.get_json()
-    obj = storage.get(City, city_id)
-    usr_o = storage.get(User, data.get('user_id'))
-    if obj is None or usr_o is None:
-        abort(404)
-    elif not data:
-        abort(400, 'Not a JSON')
-    elif 'user_id' not in data:
-        abort(400, 'Missing user_id')
-    elif 'name' not in data:
-        abort(400, 'Missing name')
-    pl = Place()
-    pl.name = data.get('name')
-    pl.user_id = data.get('user_id')
-    storage.new(pl)
-    storage.save()
-    return jsonify(pl.to_dict()), 201
-
-
-@app_views.route('/places/<place_id>', methods=['PUT'], strict_slashes=False)
-def pl_update(state_id):
-    """Updates a Place object"""
-    obj = storage.get(Place, place_id)
-    if obj is not None:
+        return jsonify({}), 200
+    if request.method == 'PUT':
         data = request.get_json()
-        if not data:
+
+        if data is None:
             abort(400, 'Not a JSON')
-        for k in data.keys():
-            if k == 'id' or k == 'created_at' or k == 'updated_at'\
-               or k == 'user_id' or k == 'city_id':
-                pass
-            else:
-                obj.name = data.get(k)
-        storage.save()
-        return jsonify(obj.to_dict()), 200
-    abort(404)
+        for k, v in data.items():
+            setattr(pl_obj, k, v)
+            pl_obj.save()
+            return jsonify(pl_obj.to_dict), 200
+
+@app_views.route('/cities/<city_id>/places',
+                 methods=['GET', 'POST'], strict_slashes=False)
+def pl_2(city_id):
+    """Retrives and creates place objects"""
+    pl_objs = storage.all(Place)
+    places = [obj.to_dict() for obj in pl_objs.values() if obj['city_id'] == city_id]
+    if len(places):
+        abort(404)
+
+    if request.method == 'GET':
+        return jsonify(places)
+    if request.method == 'POST':
+        data = request.get_json()
+
+        if data is None:
+            abort(400, 'Not a JSON')
+        if 'user_id' not in data:
+            abort(400, 'Missing user_id')
+        if 'name' not in data:
+            abort(400, 'Missing name')
+        u_obs = storage.all(User)
+        users = [obj.to_dict() for obj in u_obs.values() if obj['id'] == data['user_id']]
+        if len(users) == 0:
+            abort(404)
+        new_place = Place(**data)
+        new_place.save()
+        return jsonify(new_place.to_dict()), 201
