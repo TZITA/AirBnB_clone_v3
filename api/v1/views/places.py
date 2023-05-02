@@ -35,9 +35,9 @@ def pl_1(place_id):
                  methods=['GET', 'POST'], strict_slashes=False)
 def pl_2(city_id):
     """Retrives and creates place objects"""
-    p_obs = storage.all(Place)
-    pls = [o.to_dict() for o in p_obs.values() if o['city_id'] == city_id]
-    if len(places):
+    p = storage.all(Place)
+    pl = [o.to_dict() for o in p.values() if o.to_dict()['city_id'] == city_id]
+    if len(pl):
         abort(404)
 
     if request.method == 'GET':
@@ -47,13 +47,13 @@ def pl_2(city_id):
 
         if data is None:
             abort(400, 'Not a JSON')
-        if 'user_id' not in data:
+        if data.get('user_id') is None:
             abort(400, 'Missing user_id')
-        if 'name' not in data:
+        if data.get('name') is None:
             abort(400, 'Missing name')
-        u = storage.all(User)
-        users = [o.to_dict() for o in u.values() if o['id'] == data['user_id']]
-        if len(users) == 0:
+        u_o = storage.all(User).values()
+        us = [o.to_dict() for o in u_o if o.to_dict()['id'] == data['user_id']]
+        if len(us) == 0:
             abort(404)
         new_place = Place(**data)
         new_place.save()
