@@ -12,12 +12,14 @@ def places(city_id):
     """Retrieves the list of all Place objects associated with city_id"""
     dict_n = []
     objs = storage.all(Place).values()
-    for o in objs:
-        if o.to_dict()['city_id'] == city_id:
-            dict_n.append(o.to_dict())
-    if len(dict_n) != 0:
+    c_obj = storage.get(City, city_id)
+    if c_obj is None:
+        abort(404)
+    else:
+        for o in objs:
+            if o.to_dict()['city_id'] == city_id:
+                dict_n.append(o.to_dict())
         return (jsonify(dict_n))
-    abort(404)
 
 
 @app_views.route('/places/<place_id>', methods=['GET'], strict_slashes=False)
