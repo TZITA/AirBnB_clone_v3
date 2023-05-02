@@ -36,12 +36,12 @@ def pl_1(place_id):
 def pl_2(city_id):
     """Retrives and creates place objects"""
     p = storage.all(Place)
-    pl = [o.to_dict() for o in p.values() if o.to_dict()['city_id'] == city_id]
+    pl = [o.to_dict() for o in p.values() if o.city_id == city_id]
     if len(pl):
         abort(404)
 
     if request.method == 'GET':
-        return jsonify(places)
+        return jsonify(pl)
     if request.method == 'POST':
         data = request.get_json()
 
@@ -51,8 +51,8 @@ def pl_2(city_id):
             abort(400, 'Missing user_id')
         if data.get('name') is None:
             abort(400, 'Missing name')
-        u_o = storage.all(User).values()
-        us = [o.to_dict() for o in u_o if o.to_dict()['id'] == data['user_id']]
+        u_o = storage.all(User)
+        us = [o.to_dict() for o in u_o.values() if o.id == data['user_id']]
         if len(us) == 0:
             abort(404)
         new_place = Place(**data)

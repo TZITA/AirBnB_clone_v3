@@ -12,8 +12,8 @@ from flask import jsonify, abort, request
                  methods=['GET', 'POST'], strict_slashes=False)
 def reviews(place_id):
     """Retrieves the list of all Review objects or creates a review object"""
-    rev = storage.all(Review).values()
-    revs = [o.to_dict() for o in rev if o.to_dict()['place_id'] == place_id]
+    rev = storage.all(Review)
+    revs = [o.to_dict() for o in rev.values() if o.place_id == place_id]
     pl_o = storage.get(Place, place_id)
     if pl_o is None:
         abort(404)
