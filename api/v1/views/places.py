@@ -15,7 +15,6 @@ def pl_1(place_id):
     pl_obj = storage.get(Place, place_id)
     if pl_obj is None:
         abort(404)
-    
     if request.method == 'GET':
         return jsonify(pl_obj)
     if request.method == 'DELETE':
@@ -36,8 +35,8 @@ def pl_1(place_id):
                  methods=['GET', 'POST'], strict_slashes=False)
 def pl_2(city_id):
     """Retrives and creates place objects"""
-    pl_objs = storage.all(Place)
-    places = [obj.to_dict() for obj in pl_objs.values() if obj['city_id'] == city_id]
+    p_obs = storage.all(Place)
+    pls = [o.to_dict() for o in p_obs.values() if o['city_id'] == city_id]
     if len(places):
         abort(404)
 
@@ -52,8 +51,8 @@ def pl_2(city_id):
             abort(400, 'Missing user_id')
         if 'name' not in data:
             abort(400, 'Missing name')
-        u_obs = storage.all(User)
-        users = [obj.to_dict() for obj in u_obs.values() if obj['id'] == data['user_id']]
+        u = storage.all(User)
+        users = [o.to_dict() for o in u.values() if o['id'] == data['user_id']]
         if len(users) == 0:
             abort(404)
         new_place = Place(**data)
